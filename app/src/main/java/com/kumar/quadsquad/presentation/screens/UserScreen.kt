@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -34,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.kumar.quadsquad.R
 import com.kumar.quadsquad.core.BottomNavBar
 import com.kumar.quadsquad.logic.performPathfinding
+import com.kumar.quadsquad.ui.theme.PrimaryColor
 import com.kumar.quadsquad.ui.theme.backgroundColor
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +59,7 @@ fun UserScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues), color = backgroundColor
+                .padding(paddingValues), color = backgroundColor.copy(0.5f)
         ) {
             Column(
                 modifier = Modifier.fillMaxSize()
@@ -68,23 +70,51 @@ fun UserScreen(
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    var expanded by remember { mutableStateOf(false) }
-                    var selectedItem by remember { mutableStateOf("Item") }
+                    var expanded1 by remember { mutableStateOf(false) }
+                    var selectedItem1 by remember { mutableStateOf("1") }
 
-                    val items = listOf("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V")
+                    var expanded2 by remember { mutableStateOf(false) }
+                    var selectedItem2 by remember { mutableStateOf("Item") }
+
+                    val items = listOf(
+                        "A",
+                        "B",
+                        "C",
+                        "D",
+                        "E",
+                        "F",
+                        "G",
+                        "H",
+                        "I",
+                        "J",
+                        "K",
+                        "L",
+                        "M",
+                        "N",
+                        "O",
+                        "P",
+                        "Q",
+                        "R",
+                        "S",
+                        "T",
+                        "U",
+                        "V"
+                    )
+
+                    val floor = listOf("1","2")
 
                     ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded },
+                        expanded = expanded1,
+                        onExpandedChange = { expanded1 = !expanded1 },
                         modifier = Modifier.weight(1f)
                     ) {
                         OutlinedTextField(
                             readOnly = true,
-                            value = selectedItem,
+                            value = selectedItem1,
                             onValueChange = {},
-                            label = { Text(text = "Choose the item") },
+                            label = { Text(text = "Floor") },
                             trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1)
                             },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.Black,
@@ -97,31 +127,68 @@ fun UserScreen(
                             modifier = Modifier.menuAnchor()
                         )
 
-                        ExposedDropdownMenu(expanded = expanded,
-                            onDismissRequest = { expanded = false }) {
-                            items.forEach { option: String ->
+                        ExposedDropdownMenu(expanded = expanded1,
+                            onDismissRequest = { expanded1 = false }) {
+                            floor.forEach { option: String ->
                                 DropdownMenuItem(text = { Text(text = option) }, onClick = {
-                                    expanded = false
-                                    selectedItem = option
+                                    expanded1 = false
+                                    selectedItem1 = option
                                 })
                             }
                         }
                     }
 
-                    Button(
-                        modifier = Modifier
-                            .padding(top = 8.dp),
-                        onClick = {
-                        showImage = false
-                        performPathfinding(
-                            context, imageResId, start, end, scalingFactor
-                        ) { bitmap, message ->
-                            imageBitmap = bitmap?.asImageBitmap()
-                            statusMessage = message
-                            showImage = true
+                    ExposedDropdownMenuBox(
+                        expanded = expanded2,
+                        onExpandedChange = { expanded2 = !expanded2 },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        OutlinedTextField(
+                            readOnly = true,
+                            value = selectedItem2,
+                            onValueChange = {},
+                            label = { Text(text = "Item") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded2)
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.Black,
+                                unfocusedLabelColor = Color.Black,
+                                unfocusedTextColor = Color.Black,
+                                focusedTextColor = Color.Black,
+                                focusedLabelColor = Color.Black,
+                                focusedBorderColor = Color.Black
+                            ),
+                            modifier = Modifier.menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(expanded = expanded2,
+                            onDismissRequest = { expanded2 = false }) {
+                            items.forEach { option: String ->
+                                DropdownMenuItem(text = { Text(text = option) }, onClick = {
+                                    expanded2 = false
+                                    selectedItem2 = option
+                                })
+                            }
                         }
-                    }) {
-                        Text(text = "Find Path")
+                    }
+
+                    Button(modifier = Modifier.padding(top = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PrimaryColor.copy(0.5f)
+                        ),
+                        onClick = {
+                            showImage = false
+                            performPathfinding(
+                                context, imageResId, start, end, scalingFactor
+                            ) { bitmap, message ->
+                                imageBitmap = bitmap?.asImageBitmap()
+                                statusMessage = message
+                                showImage = true
+                            }
+                        }) {
+                        Text(text = "Find Path",
+                            color = Color.Black)
                     }
 
                 }

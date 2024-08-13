@@ -5,51 +5,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileOutputStream
-
-//@Composable
-//fun ImagePathfindingApp() {
-//    val context = LocalContext.current
-//    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-//    var statusMessage by remember { mutableStateOf("") }
-//    var showImage by remember { mutableStateOf(false) }
-//
-//    val imageResId = R.drawable.image3 // Use resource ID for the drawable
-//    val start = Pair(14, 7)
-//    val end = Pair(2, 1)
-//    val scalingFactor = 2.6F // Scaling factor for the line width
-//
-//    Column(
-//        modifier = Modifier.fillMaxSize(),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        if (showImage && imageBitmap != null) {
-//            Image(
-//                bitmap = imageBitmap!!,
-//                contentDescription = null,
-//                modifier = Modifier.fillMaxSize()
-//            )
-//            Text(text = statusMessage, modifier = Modifier.padding(top = 16.dp))
-//        }
-//
-//        Button(onClick = {
-//            showImage = false
-//            performPathfinding(context, imageResId, start, end, scalingFactor) { bitmap, message ->
-//                imageBitmap = bitmap?.asImageBitmap()
-//                statusMessage = message
-//                showImage = true
-//            }
-//        }) {
-//            Text(text = "Find Path")
-//        }
-//    }
-//}
 
 fun performPathfinding(
     context: Context,
@@ -124,101 +86,6 @@ fun performPathfinding(
     onResult(resultBitmap, message)
 }
 
-
-//@Composable
-//fun ImagePathfindingApp() {
-//    val context = LocalContext.current
-//    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-//    var statusMessage by remember { mutableStateOf("") }
-//
-//    val imageResId = R.drawable.image3 // Use resource ID for the drawable
-//    val start = Pair(14, 7)
-//    val end = Pair(2, 1)
-//    val scalingFactor = 2.6F // Scaling factor for the line width
-//
-//    LaunchedEffect(Unit) {
-//        try {
-//            val matrix = arrayOf(
-//                intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-//                intArrayOf(0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-//                intArrayOf(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-//                intArrayOf(0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-//                intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-//                intArrayOf(0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-//                intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-//                intArrayOf(0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-//                intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-//                intArrayOf(0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),
-//                intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-//                intArrayOf(0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),
-//                intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-//                intArrayOf(0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-//                intArrayOf(0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
-//            )
-//            val matrix = processImage(context, imageResId)
-//
-//            val (path, distance) = withContext(Dispatchers.Default) {
-//                findShortestPath(matrix, start, end)
-//            }
-//
-//            val bitmap = BitmapFactory.decodeResource(context.resources, imageResId)
-//                .copy(Bitmap.Config.ARGB_8888, true)
-//            val pathColor = Color.BLACK
-//
-//            val points = mutableListOf<Offset>()
-//            points.add(Offset(820f, 1531f))
-//
-//            var x = 820f
-//            var y = 1531f
-//
-//            for (direction in path) {
-//                when (direction) {
-//                    'D' -> y += 105
-//                    'U' -> y -= 105
-//                    'R' -> x += 105
-//                    'L' -> x -= 105
-//                }
-//                points.add(Offset(x, y))
-//            }
-//
-//            Log.d("Path", "Points: $points")
-//            Log.d("Path", "Path Color: $pathColor")
-//
-//            withContext(Dispatchers.IO) {
-//                drawPath(bitmap, points, pathColor, scalingFactor)
-//
-//                // Save the image to internal storage
-//                val file = File(context.filesDir, "output.jpg")
-//                FileOutputStream(file).use { out ->
-//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-//                }
-//            }
-//
-//            imageBitmap = withContext(Dispatchers.IO) {
-//                BitmapFactory.decodeFile(File(context.filesDir, "output.jpg").absolutePath)
-//                    .asImageBitmap()
-//            }
-//            if (distance != -1) {
-//                Log.d("Path", "Shortest path distance: $distance Path: $path")
-//            } else {
-//                Log.d("Path", "No path found")
-//            }
-//        } catch (e: Exception) {
-//            Log.e("Path", "Error: ${e.message}")
-//        }
-//    }
-//
-//    Column {
-//        if (imageBitmap != null) {
-//            Image(
-//                bitmap = imageBitmap!!, contentDescription = null, modifier = Modifier.fillMaxSize()
-//            )
-//            Log.d("Path", "ImageBitmap: ${imageBitmap!!.height} ${imageBitmap!!.width}")
-//        }
-//        Text(text = statusMessage, modifier = Modifier.padding(top = 16.dp))
-//    }
-//}
-
 fun drawPath(bitmap: Bitmap, points: List<Offset>, color: Int, scalingFactor: Float) {
     val canvas = Canvas(bitmap)
     val path = android.graphics.Path()
@@ -278,10 +145,10 @@ fun findShortestPath(
     return if (minDist == Int.MAX_VALUE) "" to -1 else shortestPath.toString() to minDist
 }
 
-fun processImage(context: Context, resId: Int): Array<IntArray> {
+fun processImage(context: Context, uri: Uri): Array<IntArray> {
     val NUM_BOXES_X = 15
     val NUM_BOXES_Y = 15
-    val bitmap = BitmapFactory.decodeResource(context.resources, resId)
+    val bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
         ?: throw IllegalArgumentException("Image not found")
     val width = bitmap.width
     val height = bitmap.height
@@ -290,6 +157,11 @@ fun processImage(context: Context, resId: Int): Array<IntArray> {
     val boxHeight = height / NUM_BOXES_Y
 
     val matrix = Array(NUM_BOXES_Y) { IntArray(NUM_BOXES_X) { -1 } }
+
+    // Define your colors (in RGB)
+    val whiteColor = Triple(255, 255, 255)
+    val colorD0EBE8 = Triple(208, 235, 232)
+    val color00393D = Triple(0, 57, 61)
 
     for (boxY in 0 until NUM_BOXES_Y) {
         for (boxX in 0 until NUM_BOXES_X) {
@@ -314,22 +186,32 @@ fun processImage(context: Context, resId: Int): Array<IntArray> {
                 }
             }
 
-            val avgR = (sumR / count)
-            val avgG = (sumG / count)
-            val avgB = (sumB / count)
+            // Calculate average color
+            if (count > 0) {
+                val avgR = (sumR / count)
+                val avgG = (sumG / count)
+                val avgB = (sumB / count)
 
-            matrix[boxY][boxX] = when {
-                avgG > avgR && avgG > avgB -> 1 // Green box
-                avgR > avgG && avgR > avgB -> 0 // Red box
-                avgB > avgR && avgB > avgG -> 2 // Blue box
-                else -> -1 // Undefined or other color
+                // Find the closest color
+                val avgColor = Triple(avgR, avgG, avgB)
+                val distances = mapOf(
+                    2 to calculateColorDistance(avgColor, colorD0EBE8), // D0EBE8 -> 2
+                    0 to calculateColorDistance(avgColor, color00393D), // 00393D -> 0
+                    1 to calculateColorDistance(avgColor, whiteColor)   // White -> 1
+                )
+
+                // Find the color with the smallest distance
+                matrix[boxY][boxX] = distances.minByOrNull { it.value }?.key ?: -1
             }
         }
     }
-//
-//    matrix.forEach { row ->
-//        Log.d("Matrix", row.joinToString(", "))
-//    }
 
     return matrix
+}
+
+// Helper function to calculate the Euclidean distance between two colors
+fun calculateColorDistance(color1: Triple<Int, Int, Int>, color2: Triple<Int, Int, Int>): Double {
+    val (r1, g1, b1) = color1
+    val (r2, g2, b2) = color2
+    return Math.sqrt(((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2)).toDouble())
 }

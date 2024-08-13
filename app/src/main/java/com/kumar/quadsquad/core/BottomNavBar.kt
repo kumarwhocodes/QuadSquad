@@ -18,6 +18,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kumar.quadsquad.navigation.Screen
 import com.kumar.quadsquad.ui.theme.PrimaryColor
+import com.kumar.quadsquad.ui.theme.backgroundColor
 
 @Preview
 @Composable
@@ -32,7 +33,7 @@ fun BottomNavBar(
     val currentRoute = navController.currentBackStackEntry?.destination?.route
 
     NavigationBar(
-        modifier = Modifier, containerColor = Color.White
+        modifier = Modifier, containerColor = backgroundColor.copy(0.5f)
     ) {
 
         NavigationBarItem(selected = currentRoute == Screen.UserScreen.route, onClick = {
@@ -42,7 +43,7 @@ fun BottomNavBar(
         }, icon = {
             Icon(
                 imageVector = if (currentRoute == Screen.UserScreen.route) Icons.Filled.Person else Icons.Outlined.Person,
-                contentDescription = "Home",
+                contentDescription = "User",
                 tint = if (currentRoute == Screen.UserScreen.route) PrimaryColor else Color.Gray
             )
         }, label = {
@@ -66,12 +67,12 @@ fun BottomNavBar(
         }, icon = {
             Icon(
                 imageVector = if (currentRoute == Screen.AdminScreen.route) Icons.Filled.Build else Icons.Outlined.Build,
-                contentDescription = "Favourite",
+                contentDescription = "Admin",
                 tint = if (currentRoute == Screen.AdminScreen.route) PrimaryColor else Color.Gray
             )
         }, label = {
             Text(
-                text = if (currentRoute == Screen.AdminScreen.route) "Favourite" else "",
+                text = if (currentRoute == Screen.AdminScreen.route) "Admin" else "",
                 color = if (currentRoute == Screen.AdminScreen.route) PrimaryColor else Color.Gray
             )
         }, colors = NavigationBarItemDefaults.colors(
