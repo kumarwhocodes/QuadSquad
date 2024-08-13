@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "75851589372",
+    "project_id": "quadsquad-sparkathon",
+    "storage_bucket": "quadsquad-sparkathon.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75851589372:android:0f61e1d81341dba9459979",
+        "android_client_info": {
+          "package_name": "com.kumar.quadsquad"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXkYziCyxqrlFar-7xBDFhKfL5dAyWaV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
