@@ -53,8 +53,6 @@ fun UserScreen(
     var showImage by remember { mutableStateOf(false) }
 
     val imageResId = R.drawable.image // Use resource ID for the drawable
-//    val start = Pair(0,1)
-//    val end = Pair(8,10)
     val scalingFactor = 2.6F // Scaling factor for the line width
 
     Scaffold(modifier = Modifier, topBar = {}, bottomBar = {

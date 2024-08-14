@@ -8,7 +8,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
-import com.kumar.quadsquad.data.items
+import com.kumar.quadsquad.data.itemsPosition
+import com.kumar.quadsquad.data.itemsWalkPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -19,8 +20,6 @@ suspend fun performPathfinding(
     context: Context,
     imageResId: Int,
     selectedItem: String?,
-//    start: Pair<Int, Int>,
-//    end: Pair<Int, Int>,
     scalingFactor: Float,
     onResult: (Bitmap?, String) -> Unit
 ) {
@@ -50,18 +49,21 @@ suspend fun performPathfinding(
         .copy(Bitmap.Config.ARGB_8888, true)
     val pathColor = Color.BLACK
 
-    val points = mutableListOf<Offset>()
-    points.add(Offset(164.1f, 54.7f))
+    val w=bitmap.width
+    val h=bitmap.height
 
-    var x = 164.1f
-    var y = 54.7f
+    val points = mutableListOf<Offset>()
+    points.add(Offset((w/15 + w/30).toFloat(), (w/30).toFloat()))
+
+    var x = (w/15 + w/30).toFloat()
+    var y = (w/30).toFloat()
 
     for (direction in path) {
         when (direction) {
-            'D' -> y += 109.4f
-            'U' -> y -= 109.4f
-            'R' -> x += 109.4f
-            'L' -> x -= 109.4f
+            'D' -> y += (w/15).toFloat()
+            'U' -> y -= (w/15).toFloat()
+            'R' -> x += (w/15).toFloat()
+            'L' -> x -= (w/15).toFloat()
         }
         points.add(Offset(x, y))
     }
@@ -70,7 +72,7 @@ suspend fun performPathfinding(
     Log.d("Path", "Path Color: $pathColor")
 
     runBlocking(Dispatchers.IO) {
-        drawPath(bitmap, points, pathColor, scalingFactor)
+        drawPath(bitmap, points, pathColor, scalingFactor,selectedItem)
 
         // Save the image to internal storage
         val file = File(context.filesDir, "output.jpg")
@@ -89,12 +91,19 @@ suspend fun performPathfinding(
     onResult(resultBitmap, message)
 }
 
-fun drawPath(bitmap: Bitmap, points: List<Offset>, color: Int, scalingFactor: Float) {
+fun drawPath(
+    bitmap: Bitmap,
+    points: List<Offset>,
+    color: Int,
+    scalingFactor: Float,
+    selectedItem: String?
+) {
     val canvas = Canvas(bitmap)
     val path = android.graphics.Path()
     val paint = android.graphics.Paint().apply {
         strokeWidth = 5f * scalingFactor // Adjust this base value as needed
         style = android.graphics.Paint.Style.STROKE
+        this.color = color
     }
 
     if (points.isNotEmpty()) {
@@ -105,16 +114,26 @@ fun drawPath(bitmap: Bitmap, points: List<Offset>, color: Int, scalingFactor: Fl
     }
 
     canvas.drawPath(path, paint)
+
+    if (points.isNotEmpty()) {
+        val endPoint = points.last()
+        val endPointPaint = android.graphics.Paint().apply {
+            style = android.graphics.Paint.Style.FILL
+            this.color = Color.RED
+        }
+        val (endRow,endCol) = itemsPosition.getOrDefault(selectedItem, Pair(0, 1))
+        // Draw a circle or marker at the end point
+        Log.d("Path", "$endPoint $endRow $endCol")
+        canvas.drawCircle(((bitmap.width/30)+((endCol)*(bitmap.width/15))).toFloat(), ((bitmap.width/30)+((endRow)*(bitmap.width/15))).toFloat(), 10f * scalingFactor, endPointPaint)
+    }
 }
 
 fun findShortestPath(
     matrix: Array<IntArray>,
-//    start: Pair<Int, Int>,
-//    end: Pair<Int, Int>,
     selectedItem: String?
 ): Pair<String, Int> {
     val (startRow, startCol) = Pair(0, 1)
-    val (endRow, endCol) = items.getOrDefault(selectedItem, Pair(0, 1))
+    val (endRow, endCol) = itemsWalkPosition.getOrDefault(selectedItem, Pair(0, 1))
     val directions = arrayOf("U", "D", "L", "R")
     val rowDir = arrayOf(-1, 1, 0, 0)
     val colDir = arrayOf(0, 0, -1, 1)
@@ -123,12 +142,19 @@ fun findShortestPath(
     val shortestPath = StringBuilder()
     var minDist = Int.MAX_VALUE
 
+    if(matrix[endRow][endCol]==0){
+        return Pair("",-1)
+    }
+
     fun dfs(row: Int, col: Int, path: String, dist: Int) {
         if (row == endRow && col == endCol) {
             if (dist < minDist) {
                 minDist = dist
                 shortestPath.clear().append(path)
             }
+            return
+        }
+        if(dist>minDist){
             return
         }
 
@@ -152,25 +178,26 @@ fun findShortestPath(
 }
 
 fun processImage(context: Context, uri: Uri): Array<IntArray> {
-    val NUM_BOXES_X = 15
-    val NUM_BOXES_Y = 15
+    val numBoxesX = 15
+    val numBoxesY = 15
     val bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
         ?: throw IllegalArgumentException("Image not found")
     val width = bitmap.width
     val height = bitmap.height
 
-    val boxWidth = width / NUM_BOXES_X
-    val boxHeight = height / NUM_BOXES_Y
+    val boxWidth = width / numBoxesX
+    val boxHeight = height / numBoxesY
 
-    val matrix = Array(NUM_BOXES_Y) { IntArray(NUM_BOXES_X) { -1 } }
+    Log.d("Image", "Width: $width, Height: $height")
+    val matrix = Array(numBoxesY) { IntArray(numBoxesX) { -1 } }
 
     // Define your colors (in RGB)
     val whiteColor = Triple(255, 255, 255)
     val colorD0EBE8 = Triple(208, 235, 232)
     val color00393D = Triple(0, 57, 61)
 
-    for (boxY in 0 until NUM_BOXES_Y) {
-        for (boxX in 0 until NUM_BOXES_X) {
+    for (boxY in 0 until numBoxesY) {
+        for (boxX in 0 until numBoxesX) {
             val startX = boxX * boxWidth
             val endX = (boxX + 1) * boxWidth
             val startY = boxY * boxHeight
@@ -198,26 +225,47 @@ fun processImage(context: Context, uri: Uri): Array<IntArray> {
                 val avgG = (sumG / count)
                 val avgB = (sumB / count)
 
-                // Find the closest color
+                // Find the closest color using the new logic
                 val avgColor = Triple(avgR, avgG, avgB)
-                val distances = mapOf(
-                    0 to calculateColorDistance(avgColor, colorD0EBE8), // D0EBE8 -> 0
-                    0 to calculateColorDistance(avgColor, color00393D), // 00393D -> 0
-                    1 to calculateColorDistance(avgColor, whiteColor)   // White -> 1
-                )
-
-                // Find the color with the smallest distance
-                matrix[boxY][boxX] = distances.minByOrNull { it.value }?.key ?: -1
+                matrix[boxY][boxX] = findClosestColor(avgColor)
             }
         }
+    }
+
+    matrix.forEach {
+        Log.d("Matrix", it.contentToString())
     }
 
     return matrix
 }
 
-// Helper function to calculate the Euclidean distance between two colors
-fun calculateColorDistance(color1: Triple<Int, Int, Int>, color2: Triple<Int, Int, Int>): Double {
-    val (r1, g1, b1) = color1
-    val (r2, g2, b2) = color2
+// Function to find the closest color based on threshold
+fun findClosestColor(avgColor: Triple<Int, Int, Int>): Int {
+    val whiteColor = Triple(255, 255, 255)
+    val colorD0EBE8 = Triple(208, 235, 232)
+    val color00393D = Triple(0, 57, 61)
+
+    // Calculate distances
+    val distToWhite = calculateColorDistance(avgColor, whiteColor)
+    val distToD0EBE8 = calculateColorDistance(avgColor, colorD0EBE8)
+    val distTo00393D = calculateColorDistance(avgColor, color00393D)
+
+    // Define a threshold
+    val threshold = 30.0
+
+    // If the color is very close to white, prioritize it
+    if (distToWhite < threshold) return 1
+
+    // Otherwise, choose the closest color
+    return when {
+        distToD0EBE8 < distTo00393D -> 0 // D0EBE8 -> 0
+        else -> 0 // 00393D -> 0
+    }
+}
+
+// Function to calculate color distance (Euclidean distance in RGB space)
+fun calculateColorDistance(c1: Triple<Int, Int, Int>, c2: Triple<Int, Int, Int>): Double {
+    val (r1, g1, b1) = c1
+    val (r2, g2, b2) = c2
     return Math.sqrt(((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2)).toDouble())
 }

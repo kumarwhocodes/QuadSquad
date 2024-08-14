@@ -1,6 +1,7 @@
 package com.kumar.quadsquad.presentation.screens
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.google.android.play.integrity.internal.f
+import com.google.android.play.integrity.internal.s
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
@@ -33,6 +36,7 @@ import com.kumar.quadsquad.core.BottomNavBar
 import com.kumar.quadsquad.logic.processImage
 import com.kumar.quadsquad.ui.theme.PrimaryColor
 import com.kumar.quadsquad.ui.theme.backgroundColor
+import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
 @Preview
@@ -97,6 +101,10 @@ fun AdminScreen(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = PrimaryColor.copy(0.5f)
                         ), onClick = {
+                            var f=1;
+                            db.collection("maps").get().addOnSuccessListener {
+                                f = it.size()+1
+                            }
                             // Generate a unique file name for the image
                             val imageName = UUID.randomUUID().toString()
                             val imageRef = storage.child("images/$imageName")
@@ -113,7 +121,8 @@ fun AdminScreen(
                                     db.collection("maps").add(
                                         mapOf(
                                             "matrix" to listOfMaps,
-                                            "image" to downloadUri.toString()
+                                            "image" to downloadUri.toString(),
+                                            "floorNo" to f
                                         )
                                     )
                                 }
