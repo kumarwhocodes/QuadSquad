@@ -8,39 +8,42 @@ import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
+import com.kumar.quadsquad.data.items
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
-fun performPathfinding(
+suspend fun performPathfinding(
     context: Context,
     imageResId: Int,
-    start: Pair<Int, Int>,
-    end: Pair<Int, Int>,
+    selectedItem: String?,
+//    start: Pair<Int, Int>,
+//    end: Pair<Int, Int>,
     scalingFactor: Float,
     onResult: (Bitmap?, String) -> Unit
 ) {
     val matrix = arrayOf(
+        intArrayOf(0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0),
+        intArrayOf(0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0),
+        intArrayOf(0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0),
+        intArrayOf(0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0),
+        intArrayOf(0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0),
+        intArrayOf(0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0),
+        intArrayOf(0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0),
+        intArrayOf(0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0),
+        intArrayOf(0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0),
+        intArrayOf(0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0),
+        intArrayOf(0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0),
+        intArrayOf(0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0),
+        intArrayOf(0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0),
         intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-        intArrayOf(0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-        intArrayOf(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-        intArrayOf(0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-        intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-        intArrayOf(0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-        intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-        intArrayOf(0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-        intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-        intArrayOf(0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),
-        intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-        intArrayOf(0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),
-        intArrayOf(0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0),
-        intArrayOf(0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-        intArrayOf(0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     )
 
-    val (path, distance) = runBlocking(Dispatchers.Default) {
-        findShortestPath(matrix, start, end)
+    val (path, distance) = withContext(Dispatchers.Default) {
+        findShortestPath(matrix, selectedItem)
     }
 
     val bitmap = BitmapFactory.decodeResource(context.resources, imageResId)
@@ -48,17 +51,17 @@ fun performPathfinding(
     val pathColor = Color.BLACK
 
     val points = mutableListOf<Offset>()
-    points.add(Offset(820f, 1531f))
+    points.add(Offset(164.1f, 54.7f))
 
-    var x = 820f
-    var y = 1531f
+    var x = 164.1f
+    var y = 54.7f
 
     for (direction in path) {
         when (direction) {
-            'D' -> y += 105
-            'U' -> y -= 105
-            'R' -> x += 105
-            'L' -> x -= 105
+            'D' -> y += 109.4f
+            'U' -> y -= 109.4f
+            'R' -> x += 109.4f
+            'L' -> x -= 109.4f
         }
         points.add(Offset(x, y))
     }
@@ -105,10 +108,13 @@ fun drawPath(bitmap: Bitmap, points: List<Offset>, color: Int, scalingFactor: Fl
 }
 
 fun findShortestPath(
-    matrix: Array<IntArray>, start: Pair<Int, Int>, end: Pair<Int, Int>
+    matrix: Array<IntArray>,
+//    start: Pair<Int, Int>,
+//    end: Pair<Int, Int>,
+    selectedItem: String?
 ): Pair<String, Int> {
-    val (startRow, startCol) = start
-    val (endRow, endCol) = end
+    val (startRow, startCol) = Pair(0, 1)
+    val (endRow, endCol) = items.getOrDefault(selectedItem, Pair(0, 1))
     val directions = arrayOf("U", "D", "L", "R")
     val rowDir = arrayOf(-1, 1, 0, 0)
     val colDir = arrayOf(0, 0, -1, 1)
@@ -195,7 +201,7 @@ fun processImage(context: Context, uri: Uri): Array<IntArray> {
                 // Find the closest color
                 val avgColor = Triple(avgR, avgG, avgB)
                 val distances = mapOf(
-                    2 to calculateColorDistance(avgColor, colorD0EBE8), // D0EBE8 -> 2
+                    0 to calculateColorDistance(avgColor, colorD0EBE8), // D0EBE8 -> 0
                     0 to calculateColorDistance(avgColor, color00393D), // 00393D -> 0
                     1 to calculateColorDistance(avgColor, whiteColor)   // White -> 1
                 )

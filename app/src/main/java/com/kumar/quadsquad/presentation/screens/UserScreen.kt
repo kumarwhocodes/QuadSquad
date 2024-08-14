@@ -34,11 +34,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kumar.quadsquad.R
 import com.kumar.quadsquad.core.BottomNavBar
+import com.kumar.quadsquad.data.itemsList
 import com.kumar.quadsquad.logic.performPathfinding
 import com.kumar.quadsquad.ui.theme.PrimaryColor
 import com.kumar.quadsquad.ui.theme.backgroundColor
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
 fun UserScreen(
     navController: NavController
@@ -48,9 +52,9 @@ fun UserScreen(
     var statusMessage by remember { mutableStateOf("") }
     var showImage by remember { mutableStateOf(false) }
 
-    val imageResId = R.drawable.image3 // Use resource ID for the drawable
-    val start = Pair(14, 7)
-    val end = Pair(2, 1)
+    val imageResId = R.drawable.image // Use resource ID for the drawable
+//    val start = Pair(0,1)
+//    val end = Pair(8,10)
     val scalingFactor = 2.6F // Scaling factor for the line width
 
     Scaffold(modifier = Modifier, topBar = {}, bottomBar = {
@@ -75,31 +79,6 @@ fun UserScreen(
 
                     var expanded2 by remember { mutableStateOf(false) }
                     var selectedItem2 by remember { mutableStateOf("Item") }
-
-                    val items = listOf(
-                        "A",
-                        "B",
-                        "C",
-                        "D",
-                        "E",
-                        "F",
-                        "G",
-                        "H",
-                        "I",
-                        "J",
-                        "K",
-                        "L",
-                        "M",
-                        "N",
-                        "O",
-                        "P",
-                        "Q",
-                        "R",
-                        "S",
-                        "T",
-                        "U",
-                        "V"
-                    )
 
                     val floor = listOf("1","2")
 
@@ -164,7 +143,7 @@ fun UserScreen(
 
                         ExposedDropdownMenu(expanded = expanded2,
                             onDismissRequest = { expanded2 = false }) {
-                            items.forEach { option: String ->
+                            itemsList.forEach { option: String ->
                                 DropdownMenuItem(text = { Text(text = option) }, onClick = {
                                     expanded2 = false
                                     selectedItem2 = option
@@ -179,13 +158,16 @@ fun UserScreen(
                         ),
                         onClick = {
                             showImage = false
-                            performPathfinding(
-                                context, imageResId, start, end, scalingFactor
-                            ) { bitmap, message ->
-                                imageBitmap = bitmap?.asImageBitmap()
-                                statusMessage = message
-                                showImage = true
+                            GlobalScope.launch {
+                                performPathfinding(
+                                    context, imageResId,selectedItem2, scalingFactor
+                                ) { bitmap, message ->
+                                    imageBitmap = bitmap?.asImageBitmap()
+                                    statusMessage = message
+                                    showImage = true
+                                }
                             }
+
                         }) {
                         Text(text = "Find Path",
                             color = Color.Black)

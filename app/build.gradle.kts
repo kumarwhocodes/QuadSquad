@@ -95,4 +95,7 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     //Storage
     implementation (libs.firebase.storage.ktx)
+
+    //Coil
+    implementation(libs.coil.compose)
 }
